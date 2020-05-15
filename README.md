@@ -1,4 +1,181 @@
 # av1-estrutura
 Meu trabalho
 
-#include <iostream> #include<stdio.h> #include<conio.h> #include <string.h> using namespace std;  struct Cliente {      int idade;     char cpf[11];     int sexo; }; void Menu ();  void cadastrar(struct Cliente c[3] , struct Cliente fila[3]){     int i,verifica;          for(i=0;i<3;i++){     printf ("\nDigite a idade do cliente: \n");     scanf("%i" ,&c[i].idade);     printf("Digite o cpf do cliente: \n");     scanf("%s", &c[i].cpf);     printf("Digite o sexo do cliente: 1-feminino 2- masculino \n ");     scanf ("%i", &c[i].sexo);     if(c[i].sexo==1){         printf("A senhora esta gravida? 1-sim 2-nao \n","\n");         scanf("%i", &verifica);         if(verifica==1){           fila[i]=c[i] ;          }         }         else {         	if(c[i].idade > 65)         	{         		fila[i]=c[i]; 			} 		}         verifica= 0;         }      Menu(); };  void proximo(struct Cliente fila){     int i;     struct Cliente c[3];     for(i=0;i<3;i++){     }     printf( "A fila de atendimento é a seguinte: \n");     for(i=0;i<3;i++){     printf ("%s", &fila.cpf); 	} 	          for(i=0;i<3;i++){     if (fila.idade==0){                      printf("Não há ninguem cadastrado!\n");     }     else {     	     	   printf("\n\nO proximo da fila é: ",&fila.cpf ,"\n");     }     }      Menu(); };  void sair(){     printf("Obrigado por usar o programa ");     exit(0); }; void inicializar(struct Cliente fila){     struct Cliente c[3];     int i; for(i=0; i<3; i++) {     strcpy(fila.cpf, "NULL");     fila.idade = 0;     fila.sexo = 0;     cout<<"Programa inicializado corretamente \n";     Menu(); } }  void verificar(struct Cliente){ 	int i; 	struct Cliente fila[3]; 	struct Cliente c[3]; 	for(i=0;i<3;i++){ 	 	printf("\n%s\n", &fila[i].cpf); } 	Menu(); } void Menu(){ 	int opcao;     struct Cliente c[3];     struct Cliente fila[3];     cout<<"Bem vindo, o que voce deseja? \n\n 1 - Cadastrar \n 2- Proximo da Fila \n 3- Fechar programa \n 4- Inicializar programa (recomendado inicialmente) \n  5- Verificar fila - \n ";     cin>>opcao;     switch(opcao){         case 1 : cadastrar(c, fila);         break;         case 2 : proximo(fila[3]);         break;         case 3 : sair();         break;         case 4 : inicializar(fila[3]);         break;         case 5 : verificar(c[3]);          default : cout<<"Voce digitou um valor incorreto \n";      } }; int main() {    Menu();      return 0; }
+#include <iostream>
+
+using namespace std;
+
+struct Pessoa
+{
+	int idade  = 0;
+	string cpf = "0";
+	int sexo = 0;
+	bool esta_gravida = false;
+
+	Pessoa* proximo = NULL;
+	Pessoa* anterior = NULL;
+};
+
+void printPessoa(Pessoa pessoa);
+int lerInteiro(string campo);
+string lerString(string campo);
+
+int main(void)
+{
+	Pessoa* inicioLista = NULL;
+	Pessoa* fimLista = NULL;
+	Pessoa* aux = NULL;
+
+	int opcao = 0;
+	while (opcao != 4)
+	{
+		cout<<  "_________";
+		cout << "\n|1-Próximo atendimento    |";
+		cout << "\n|2-Exibir cadastros       |";
+		cout << "\n|3-Apagar cadastros       |";
+		cout << "\n|4-Sair                   |" << endl;
+		cout<<  "|_________|" <<endl;
+		cin >> opcao;
+
+		switch (opcao)
+		{
+			case 1:
+			{
+				Pessoa* novo = new Pessoa;
+				novo->idade = lerInteiro("idade");
+				novo->cpf = lerString("cpf");
+				novo->sexo = lerInteiro("sexo (1-Feminino/2-Masculino)");
+				if (novo->sexo == 1)
+				{
+					int gravida;
+					cout << "\nVocê esta gravida? (1-Sim/2-Não): ";
+					cin >> gravida;
+					if (gravida == 1)
+					{
+						novo->esta_gravida = true;
+					}
+					else
+					{
+						novo->esta_gravida = false;
+					}
+				}
+
+				if (novo->idade > 65 || novo->esta_gravida == true)
+				{
+					if (inicioLista == NULL)
+					{
+						inicioLista = novo;
+						fimLista = novo;
+						novo->proximo = NULL;
+						novo->anterior = NULL;
+					}
+					else
+					{
+						novo->proximo = inicioLista;
+						inicioLista->anterior = novo;
+						novo->anterior = NULL;
+						inicioLista = novo;
+					}
+				}
+				else
+				{
+					if (inicioLista == NULL)
+					{
+						inicioLista = novo;
+						fimLista = novo;
+						novo->proximo = NULL;
+						novo->anterior = NULL;
+					}
+					else
+					{
+						fimLista->proximo = novo;
+						novo->anterior = fimLista;
+						novo->proximo = NULL;
+						fimLista = novo;
+					}
+				}
+			} break;
+
+			case 2:
+			{
+				if (inicioLista == NULL)
+				{
+					cout << "\nLista Vazia" << endl;
+				}
+				else
+				{
+					aux = inicioLista;
+					while (aux != NULL)
+					{
+						printPessoa(*aux);
+						aux = aux->proximo;
+					}
+				}
+			} break;
+
+			case 3:
+			{
+				if (inicioLista == NULL)
+				{
+					cout << "\nLista Vazia" << endl;
+				}
+				else
+				{
+					aux = inicioLista;
+
+					printPessoa(*aux);
+
+					aux = aux->proximo;
+
+					aux = inicioLista;
+
+					inicioLista = inicioLista->proximo;
+					delete(aux);
+					aux = inicioLista;
+				}
+			} break;
+		}
+	}
+
+	return 0;
+}
+
+int lerInteiro(string campo)
+{
+	int valor;
+	cout << "\nDigite " << campo << ": ";
+	cin >> valor;
+
+	return valor;
+}
+
+string lerString(string campo)
+{
+	string valor;
+	cout << "\nDigite " << campo << ": ";
+	cin >> valor;
+
+	return valor;
+}
+
+void printPessoa(Pessoa pessoa)
+{
+	cout << "\nIdade = " << pessoa.idade << endl;
+	cout << "CPF = " << pessoa.cpf << endl;
+	if (pessoa.sexo == 1)
+	{
+		cout << "Pessoa do sexo feminino!\n";
+		if (pessoa.esta_gravida == true)
+		{
+			cout << "Está grávida!\n";
+		}
+		else
+		{
+			cout << "Não está grávida!\n";
+		}
+	}
+	else
+	{
+		cout << "Pessoa do sexo masculino!\n";
+	}
+}
